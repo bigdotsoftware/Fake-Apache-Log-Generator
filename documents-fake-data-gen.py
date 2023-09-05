@@ -57,7 +57,7 @@ faker = Faker()
 timestr = time.strftime("%Y%m%d-%H%M%S")
 otime = datetime.datetime.now()
 
-outFileName = 'access_log_'+timestr+'.log' if not file_prefix else file_prefix+'_access_log_'+timestr+'.log'
+outFileName = 'documents_data_'+timestr+'.log' if not file_prefix else file_prefix+'_access_log_'+timestr+'.log'
 
 for case in switch(output_type):
     if case('LOG'):
@@ -70,42 +70,23 @@ for case in switch(output_type):
     if case():
         f = sys.stdout
 
-response=["200","404","500","301"]
-
-verb=["GET","POST","DELETE","PUT"]
-
-resources=["/", "/auth/login", "/auth/logout", "/download.php?fname=documents.zip&authcode=FGUYER459ASD12", "/download.php?fname=sample.pdf&authcode=TYU3498GHDF12", "/list","/wp-content","/wp-admin","/explore","find.php?phrase=Elasticsearch","find.php?phrase=Book of Elasticsearch","find.php?phrase=Elasticsearch in Practice","find.php?phrase=Elasti search","find.php?phrase=ElasticSearch","/search/tag/list","/app/main/posts","/posts/posts/explore","/apps/cart.jsp?appID="]
-
-ualist = [faker.firefox, faker.chrome, faker.safari, faker.internet_explorer, faker.opera]
-
 flag = True
 while (flag):
     if args.sleep:
         increment = datetime.timedelta(seconds=args.sleep)
     else:
         #increment = datetime.timedelta(seconds=random.randint(30, 300))
-        #increment = datetime.timedelta(milliseconds=1)
-        #increment = datetime.timedelta(seconds=random.randint(0, 5))
         increment = datetime.timedelta(milliseconds=random.randint(0, 300))
+        #increment = datetime.timedelta(seconds=random.randint(0, 5))
     otime += increment
 
     ip = faker.ipv4()
     dt = otime.strftime('%d/%b/%Y:%H:%M:%S')
     tz = datetime.datetime.now(local).strftime('%z')
-    vrb = numpy.random.choice(verb,p=[0.6,0.1,0.1,0.2])
+    content = faker.text()
+    #https://faker.readthedocs.io/en/master/locales/la.html?highlight=#faker.providers.lorem.la.Provider.text
 
-    uri = random.choice(resources)
-    if uri.find("apps")>0:
-        uri += str(random.randint(1000,10000))
-
-    resp = numpy.random.choice(response,p=[0.9,0.04,0.02,0.04])
-    byt = int(random.gauss(5000,50))
-    referer = faker.uri()
-    useragent = numpy.random.choice(ualist,p=[0.5,0.3,0.1,0.05,0.05] )()
-    if log_format == "CLF":
-        f.write('%s - - [%s %s] "%s %s HTTP/1.0" %s %s\n' % (ip,dt,tz,vrb,uri,resp,byt))
-    elif log_format == "ELF": 
-        f.write('%s - - [%s %s] "%s %s HTTP/1.0" %s %s "%s" "%s"\n' % (ip,dt,tz,vrb,uri,resp,byt,referer,useragent))
+    f.write('%s - - [%s %s] "%s"\n' % (ip,dt,tz,content))
     f.flush()
 
     log_lines = log_lines - 1
